@@ -1,0 +1,4 @@
+interface:
+  display_name: "相亲自我画像与相亲帖助手"
+  short_description: "通过渐进式提问厘清自我画像、关系需求与择偶偏好，生成自然真实的多平台相亲帖文案"
+  default_prompt: "使用 $dating-profile-assistant 梳理我的关系需求与择偶偏好，并写一篇真实自然的相亲帖。"
