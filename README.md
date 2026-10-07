@@ -1,101 +1,68 @@
 # 相亲自我画像与相亲帖助手
 
-一个通过网页问卷帮助用户梳理自我画像、关系需求与择偶偏好，再由当前 AI 生成分析和多平台相亲帖的 Skill。用户不知道答案时，可以选择“不确定”，继续填写对应情景题。
-
-默认流程：在电脑默认浏览器打开本地网页 → 分步填答 → 在汇总表选择公开范围 → 点击“复制答案并交给 AI” → 手动粘贴到当前对话 → AI 输出结果。完整流程见 [web-interaction.md](web-interaction.md)。
+当前版本 **1.4.0**。通过本地问卷梳理自我画像、关系需求与择偶偏好，并让当前 AI 生成真诚自然的相亲帖或分析。
 
 ## 安装
 
-将整个 `dating-profile-assistant` 文件夹复制到 Codex 的 Skills 目录：
+适用于能够读取 Skill、运行本地脚本的 AI 助手。将整个 `dating-profile-assistant` 文件夹安装到所用助手的 Skills 位置，保留入口、脚本、素材和指南；不要只复制 `SKILL.md`。
 
-- Windows 默认：`%USERPROFILE%\.codex\skills\dating-profile-assistant\`
-- 如已设置 `CODEX_HOME`：`%CODEX_HOME%\skills\dating-profile-assistant\`
-- macOS/Linux 默认：`~/.codex/skills/dating-profile-assistant/`
+- **Codex 新用户**：个人目录为 `~/.agents/skills/dating-profile-assistant/`；Windows 对应 `%USERPROFILE%\.agents\skills\dating-profile-assistant\`。项目内也可使用 `.agents/skills/`。[官方安装说明](https://learn.chatgpt.com/docs/build-skills)
+- **其他本地助手**：按该助手自己的 Skill 安装方式安装，确认能发现本技能。
+- **已有安装**：若助手已识别现有位置，直接更新该位置，避免在多个目录重复安装同名 Skill。
 
-保持 `SKILL.md` 位于文件夹根目录，并一并复制 `assets/`、`scripts/`、所有 Markdown 文件、`styles/` 和 `references/`。打开本地问卷需要现有 Python 运行时；问卷是自包含 HTML，不需要服务器或网络。
+## 一句话开始
 
-## 使用
+在安装 Skill 的 AI 对话中说：
 
-用户可直接描述目标，例如：
+> 使用 dating-profile-assistant，帮我写一篇相亲帖。
 
-- “我资料很少，帮我一步步想起兴趣，再写一篇小红书相亲帖。”
-- “打开本地问卷，填完后我会复制并手动粘贴答案给你，再生成画像与相亲帖。”
-- “我不知道喜欢什么样的人，帮我从不能接受的相处模式开始梳理。”
-- “根据这些回答做一份恋爱定位报告，分析时别给我贴人格标签。”
-- “把这段自我介绍改成朋友圈版本，保留我的说话语气，收入别写。”
+也可以说：“帮我梳理择偶需求”“生成一份关系画像”“把已有介绍改成朋友圈版本”。可用助手的技能选择器选择本技能，不要求所有助手使用同一种命令格式。
 
-支持单项或全流程。网页每步最多 5 题；快速模式 18 题，标准模式 35 题，按目标、已答资料和不确定分支调整。深度模式可选主题；随时可跳过或提前生成答案。填写完毕后在汇总表逐项授权写入详情帖，支持“全选”和“全部不选”；默认仅供分析。平台与语气可多选，批量输出按所选组合数量生成并按平台分组。纯文字题只有主输入框，选择题保留补充内容。
+AI 会复用你已提供的资料，自动构建并请求默认浏览器打开完整问卷，同时给出页面链接作为备用。你不需要运行命令、寻找 HTML 或打开 `assets/` 中的文件。没有可用的本地 Python 或浏览器时，AI 改用文字问卷，不要求安装依赖。已有资料充分且只需改写时，AI 可以直接处理。
 
-只要求改写、资料已经完整，或明确偏好文字交流时，AI 可以直接处理，不强制打开网页。
+## 填写
 
-### 本地预览问卷
+首页确认目标和模式；未指定时默认快速写帖。每步最多 5 题，快速写帖默认 15 题、标准 39 题；其他目标采用对应题单，深度模式只展开选定主题。每题可跳过、不确定或不想回答，可以随时提前结束。
 
-在本目录运行以下命令，构建后用系统默认浏览器打开独立问卷。只依赖 Python 标准库，不需要安装 Python 包或启动服务。
+填写后核对答案，勾选允许写入公开文案的资料。**所有回传答案用于 AI 分析，只有明确授权且未被公开规则排除的内容可以进入公开文案。** 全选不会覆盖公开限制，写作参数不属于个人公开授权。
 
-```powershell
-python scripts/build_form.py --output "$env:TEMP\dating-profile-questionnaire.html"
-python scripts/open_form.py "$env:TEMP\dating-profile-questionnaire.html"
-```
+写帖时可在核对页补选平台、语气、长度；平台和语气可多选，页面显示预计版本数。缺少参数也可先复制，由 AI 在原对话中确认。画像、报告和择偶分析不要求选择平台。
 
-macOS/Linux 可将输出路径换成 `$TMPDIR/dating-profile-questionnaire.html`，并使用 `python3` 运行。
+## 回传与修改
 
-填写内容只保存在当前页面内存中。提交按钮将结构化答案复制到剪贴板；用户需要自行粘贴到搭载此 Skill 的 AI 对话。
+1. 点击“复制答案”。如果浏览器不允许自动复制，按页面提示手动复制完整文本。
+2. 回到刚才启动问卷的 AI 对话，粘贴并发送。
+3. AI 直接按你的目标生成结果；网页不会自动发送或生成。
+4. 后续可在原对话说“换成豆瓣版”“再简洁一点”或更正资料，AI 复用现有资料，不要求从头填写。
 
-## 文件结构
+修改网页答案或公开范围后需要重新复制。新填写内容仅在页面内存中，刷新或关闭会丢失；预填资料嵌入本地 HTML，页面和复制文本应作为个人资料管理。
+
+## 维护与验证
+
+以下命令由助手或维护者执行，普通使用不需要操作终端。打开入口为 `scripts/start_form.py`，它复用构建器与浏览器启动器；路径从安装位置解析，不依赖开发者的电脑目录。
 
 ```text
-dating-profile-assistant/
-├── .gitignore
-├── SKILL.md
-├── README.md
-├── questionnaire.md
-├── preference-analysis.md
-├── relationship-analysis.md
-├── dating-report-template.md
-├── writing-guide.md
-├── privacy-safety.md
-├── web-interaction.md
-├── agents/openai.yaml
-├── assets/
-│   ├── form-controls.json
-│   ├── form-shell.html
-│   ├── form-model.js
-│   ├── form-ui.js
-│   └── local-form.css
-├── scripts/
-│   ├── build_form.py
-│   └── open_form.py
-├── tests/
-│   ├── scenarios.md
-│   ├── test_build_form.py
-│   └── form-model.test.cjs
-├── styles/
-│   ├── xiaohongshu.md
-│   ├── douban.md
-│   ├── weibo.md
-│   ├── douyin.md
-│   ├── moments.md
-│   ├── dating-group.md
-│   └── generic.md
-└── references/
-    ├── README.md
-    ├── xiaohongshu/README.md
-    └── douban/README.md
+python scripts/start_form.py --output-dir <当前任务授权的输出目录> [--prefill <预填JSON路径>]
 ```
 
-## 添加参考资料
+使用当前助手提供的 Python 运行时；macOS/Linux 通常为 `python3`。stdout 返回 `html_path`、`skill_version`、`browser_opened`。打开失败时保留完整页面；`--no-open` 只构建，用于自动检查。`assets/form-shell.html` 是内部模板，不能直接填写。低层构建和打开脚本保留用于维护。
 
-将用户有权使用的帖子或自己的文案放到 `references/<平台>/`。参考资料只用来提炼标题、结构、段落、语气等特征，不复制个人信息、原句或独特表达。不希望随 Skill 分发的资料不要放进 Skill 包。
+完整启动、预填及接收规则见 [web-interaction.md](web-interaction.md)；隐私规则见 [privacy-safety.md](privacy-safety.md)。题目只维护于 [questionnaire.md](questionnaire.md)，稳定题号 q01–q89 对应控件配置。分析与写作分别按入口的指南路由，不复制或虚构个人素材；参考治理见 [references/README.md](references/README.md)。
 
-## 扩展与维护
+在 Skill 目录运行：
 
-- **添加平台**：新增 `styles/<platform>.md`，只记录会改变写作选择的规则；在 `SKILL.md` 增加路由说明，在本文件结构中登记。
-- **添加问题模块**：题目文案只维护在 `questionnaire.md`；稳定题号对应 `assets/form-controls.json` 的控件配置。新增题号时同步调整构建器的编号校验、模式/分支映射和测试，保留旧题号以兼容预填资料。
-- **修改报告**：编辑 `dating-report-template.md`，并检查 `relationship-analysis.md` 与 `preference-analysis.md` 是否引用一致。
-- **隐私规则**：集中维护在 `privacy-safety.md` 和核心入口必要提醒，避免各平台独自发明隐私承诺。
+```text
+python -m unittest discover -s tests -p "test_*.py"
+node --test tests/form-model.test.cjs tests/quality-model.test.cjs tests/content-fixtures.test.cjs
+node --test tests/browser.test.cjs
+```
 
-## 验收场景
+浏览器测试使用已有 Playwright 和系统浏览器，不安装测试框架。用 `BROWSER_CHANNEL=msedge` 或 `chrome` 选择浏览器，必要时设置 `PLAYWRIGHT_MODULE` 和 `PYTHON_EXECUTABLE` 指向现有运行时。合成页面与截图保存在工作区 `output/playwright/<浏览器>/`，自动检查不向真实聊天发送消息。内容行为按 [对话验收场景](tests/scenarios.md) 和 [固定案例评价方法](tests/content-evaluation.md) 另行验证。
 
-见 [tests/scenarios.md](tests/scenarios.md)。它们用于检查对话行为与关键边界，不要求引入新的测试框架。
+## 构建分发包
 
-网页实现使用标准库测试：在 Skill 目录执行 `python -m unittest discover -s tests -p "test_*.py"` 与 `node --test tests/form-model.test.cjs`。不在验收中向真实 AI 对话提交测试消息。
+```text
+python scripts/package_skill.py --output ../dating-profile-assistant-1.4.0.zip
+```
+
+版本唯一来源为入口的 `metadata.version`。分发包采用文件名白名单，仅包含运行资源、参考摘要和合成测试；不包含真实预填、生成页面、原始人物帖子或验证输出。新增资源必须更新白名单和解包测试；安装更新前备份，更新后核对版本与文件哈希。
