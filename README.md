@@ -1,6 +1,4 @@
-# 相亲自我画像与相亲帖助手
-
-当前版本 **1.5.0**。Skill 已内置完整的 [浏览器问卷 questionnaire.html](questionnaire.html)，包含全部题库、样式和交互脚本。页面可直接打开，无需先运行 Python、启动服务器或连接网络。
+当前版本 **1.5.1**。Skill 已内置完整的 [浏览器问卷 questionnaire.html](questionnaire.html)，包含全部题库、样式和交互脚本。页面可直接打开，无需先运行 Python、启动服务器或连接网络。
 
 ## 安装
 
@@ -25,6 +23,8 @@
 ## 填写
 
 首页选择目标和模式，默认快速写帖。每步最多 5 题，快速写帖默认15题、标准39题；其他目标使用对应题单，深度模式按主题展开。每题可跳过、不确定或不想回答，随时可以提前核对。
+
+画像、择偶、报告和全流程增加性格情境题：快速取5题，标准取10题；深度自我或择偶主题取15题，只有关系主题时取6题。支持多选或直接写补充，尚不清楚可以跳过。AI结合你的实际表现、吸引偏好和关系需要，解释值得观察的伴侣特点与相处条件；单独画像只做画像。
 
 核对后勾选允许写进公开文案的资料。所有回传答案用于 AI 分析；公开文案仅使用明确授权且未被公开规则排除的资料。全选不覆盖限制，写作参数不属于个人授权。
 
@@ -52,13 +52,13 @@ python scripts/build_form.py --portable --output questionnaire.html
 python scripts/start_form.py --output-dir <当前任务授权的目录> [--prefill <预填JSON路径>]
 ```
 
-启动器保留唯一文件、不覆盖旧页面和失败恢复逻辑；stdout 返回 `html_path/skill_version/browser_opened`。完整规则见 [web-interaction.md](web-interaction.md)，隐私规则见 [privacy-safety.md](privacy-safety.md)。题库唯一来源为 [questionnaire.md](questionnaire.md)，题号 q01–q89 稳定。
+启动器保留唯一文件、不覆盖旧页面和失败恢复逻辑；stdout 返回 `html_path/skill_version/browser_opened`。完整规则见 [web-interaction.md](web-interaction.md)，隐私规则见 [privacy-safety.md](privacy-safety.md)。题库唯一来源为 [questionnaire.md](questionnaire.md)，原题号 q01–q89 稳定，新增性格情境题 q90–q104；这些题是定性探索，不计算人格或匹配分数。
 
 在 Skill 目录运行：
 
 ```text
 python -m unittest discover -s tests -p "test_*.py"
-node --test tests/form-model.test.cjs tests/quality-model.test.cjs tests/content-fixtures.test.cjs
+node --test tests/form-model.test.cjs tests/quality-model.test.cjs tests/content-fixtures.test.cjs tests/personality-model.test.cjs
 node --test tests/browser.test.cjs tests/bundled-browser.test.cjs
 ```
 
@@ -67,7 +67,7 @@ node --test tests/browser.test.cjs tests/bundled-browser.test.cjs
 ## 构建分发包
 
 ```text
-python scripts/package_skill.py --output ../dating-profile-assistant-1.5.0.zip
+python scripts/package_skill.py --output ../dating-profile-assistant-1.5.1.zip
 ```
 
 版本唯一来源为 `SKILL.md` 的 `metadata.version`。分发器将当前源资源生成的干净 `questionnaire.html` 直接写进 ZIP，不读取或覆盖源目录同名 HTML，防止误带个人预填。不包含真实预填、个人生成页面、原始人物帖子或验证输出。安装更新前备份，更新后核对版本和文件哈希。
