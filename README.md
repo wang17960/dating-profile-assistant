@@ -1,4 +1,6 @@
-当前版本 **1.5.1**。Skill 已内置完整的 [浏览器问卷 questionnaire.html](questionnaire.html)，包含全部题库、样式和交互脚本。页面可直接打开，无需先运行 Python、启动服务器或连接网络。
+# 相亲自我画像与相亲帖助手
+
+当前版本 **1.5.2**。Skill 已内置完整的 [浏览器问卷 questionnaire.html](questionnaire.html)，包含全部题库、样式和交互脚本。页面可直接打开，无需先运行 Python、启动服务器或连接网络。
 
 ## 安装
 
@@ -27,6 +29,10 @@
 画像、择偶、报告和全流程增加性格情境题：快速取5题，标准取10题；深度自我或择偶主题取15题，只有关系主题时取6题。支持多选或直接写补充，尚不清楚可以跳过。AI结合你的实际表现、吸引偏好和关系需要，解释值得观察的伴侣特点与相处条件；单独画像只做画像。
 
 核对后勾选允许写进公开文案的资料。所有回传答案用于 AI 分析；公开文案仅使用明确授权且未被公开规则排除的资料。全选不覆盖限制，写作参数不属于个人授权。
+
+兴趣可以多选或自行添加，数量不限，也不用选出最能代表自己的一项。想多聊哪些兴趣，就展开它们的可选卡片：先写作品、原因、阶段、节奏和方式，再写分享期待、重要程度及相处期待。两页分别最多5项和3项，每个字段都能跳过，只填名称也可以继续。过去的投入、现在的爱好和想尝试的计划会分开理解，回传后直接分析，不增加必答访谈。
+
+核对页将兴趣名称与每项细节分开授权，默认仅供分析。只勾选名称不会公开具体作品；单独勾选某条细节，只允许该行内容及显示的所属兴趣名称。AI会区分同一口味、能聊得来、能一起参与和尊重各自空间，不从作品口味推断人格。
 
 写帖可补选平台、语气、长度，并显示组合版本数；缺参数可先复制，由 AI 在原对话确认。画像、报告和择偶分析不要求选择平台。
 
@@ -58,8 +64,8 @@ python scripts/start_form.py --output-dir <当前任务授权的目录> [--prefi
 
 ```text
 python -m unittest discover -s tests -p "test_*.py"
-node --test tests/form-model.test.cjs tests/quality-model.test.cjs tests/content-fixtures.test.cjs tests/personality-model.test.cjs
-node --test tests/browser.test.cjs tests/bundled-browser.test.cjs
+node --test tests/form-model.test.cjs tests/quality-model.test.cjs tests/content-fixtures.test.cjs tests/personality-model.test.cjs tests/interest-model.test.cjs
+node --test tests/browser.test.cjs tests/bundled-browser.test.cjs tests/interest-browser.test.cjs
 ```
 
 浏览器检查使用已有 Playwright 和系统浏览器，无需安装测试框架。`BROWSER_CHANNEL` 指定 `msedge` 或 `chrome`；必要时设置 `PLAYWRIGHT_MODULE/PYTHON_EXECUTABLE`。内置页专用检查不调用 Python，直接打开单独搬迁的 HTML，并禁用网络。合成页面和截图保存在工作区 `output/playwright/<浏览器>/`，自动检查不向真实聊天发送消息。内容按 [对话场景](tests/scenarios.md) 和 [评价方法](tests/content-evaluation.md) 验证，参考治理见 [references/README.md](references/README.md)。
@@ -67,8 +73,7 @@ node --test tests/browser.test.cjs tests/bundled-browser.test.cjs
 ## 构建分发包
 
 ```text
-python scripts/package_skill.py --output ../dating-profile-assistant-1.5.1.zip
+python scripts/package_skill.py --output ../dating-profile-assistant-1.5.2.zip
 ```
 
 版本唯一来源为 `SKILL.md` 的 `metadata.version`。分发器将当前源资源生成的干净 `questionnaire.html` 直接写进 ZIP，不读取或覆盖源目录同名 HTML，防止误带个人预填。不包含真实预填、个人生成页面、原始人物帖子或验证输出。安装更新前备份，更新后核对版本和文件哈希。
-
